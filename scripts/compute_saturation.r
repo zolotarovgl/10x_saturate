@@ -1,3 +1,4 @@
+options(warn=-1)
 library(data.table)
 library(parallel)
 library(argparse)

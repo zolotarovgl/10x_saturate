@@ -10,7 +10,7 @@ parser.add_argument('-b', '--bam', required=True, help='Input BAM file')
 parser.add_argument('-o', '--output', required=True, help='Output file')
 parser.add_argument('-n', '--ncells', type=int, required=True, help='Number of cells')
 parser.add_argument('-r', '--mapping_rate', type=float, required=True, help='Mapping rate')
-parser.add_argument('-s', '--nsteps', type=int, required=True, help='Number of steps')
+parser.add_argument('-s', '--nsteps', type=int, required=False,default = 10, help='Number of steps')
 parser.add_argument('-c', '--ncpu', type=int, required=False,default = 1, help='Number of CPUs to use')
 parser.add_argument('-t', '--temp', required=False,default = '_tmp', help='Temporary directory')
 parser.add_argument('-f', '--tabfile', required=False,default = 'tags.tab', help='File to store tags')
@@ -40,7 +40,7 @@ print(f"Compute sequencing saturation curve")
 print(f"Alignment: {BAM}\nOutput: {OUTPUT}\nN cells: {NCELLS}\nMapping rate: {MAPPING_RATE}\nN threads: {NCPU}")
 
 
-gettags_command = ['python', 'gettags.py', '--num_threads', str(NCPU), BAM, TEMP]
+gettags_command = ['python', 'scripts/gettags.py', '--num_threads', str(NCPU), BAM, TEMP]
 print(f"Executing command: {' '.join(gettags_command)}")
 subprocess.run(gettags_command)
 
@@ -57,7 +57,7 @@ subprocess.run(['rm', '-rf', TEMP])
 
 print(f"Removed temp directory: {TEMP}")
 # Execute compute_saturation.r script
-subprocess.run(['Rscript', 'compute_saturation.r', '--ncpu', str(NCPU), '--mapping_rate', str(MAPPING_RATE), TABFILE, OUTPUT, str(NCELLS), '--nstep', str(NSTEPS)])
+subprocess.run(['Rscript', 'scripts/compute_saturation.r', '--ncpu', str(NCPU), '--mapping_rate', str(MAPPING_RATE), TABFILE, OUTPUT, str(NCELLS), '--nstep', str(NSTEPS)])
 
 # Uncomment the line below if you want to remove TABFILE after execution
 # subprocess.run(['rm', TABFILE])

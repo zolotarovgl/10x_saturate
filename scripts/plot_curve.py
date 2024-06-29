@@ -42,6 +42,8 @@ except FileNotFoundError:
 da = pd.DataFrame({'ninput': np.linspace(min(d['ninput']), max(d['ninput']) * args.maxx, num=args.n_points)})
 pred_train, pred_new, popt = fit_model(d, da)
 
+highest_saturation = np.max(pred_new)
+
 # Calculate R-squared and RMSE for training data
 r2_train = r2_score(d['sat'], pred_train)
 rmse_train = np.sqrt(mean_squared_error(d['sat'], pred_train))
@@ -53,11 +55,12 @@ rmse_new = np.sqrt(mean_squared_error(d['sat'], pred_train))  # Same as training
 
 # Plotting with metrics
 plt.figure(figsize=(10, 6))
+plt.plot(da['ninput'] / 1e6, pred_new, color='gray', label='Predicted Saturation (New Data)', alpha=0.5)
 plt.scatter(d['ninput'] / 1e6, pred_train, color='red', label='Predicted Saturation (Training Data)')
-plt.plot(da['ninput'] / 1e6, pred_new, '-o', color='gray', label='Predicted Saturation (New Data)', alpha=0.5)
 plt.xlabel('Coverage, M reads')
 plt.ylabel('Saturation')
 plt.axvline(x=d.iloc[-1]['ninput'] / 1e6, color='red', linestyle='--', label='Last Data Point')
+plt.axhline(y=highest_saturation, color='grey',linestyle=':', label=f'Highest Saturation: {highest_saturation:.2f}')
 plt.title('Saturation Curve with Model Fit')
 plt.text(0.05, 0.9, f'R-squared: {r2_train:.3f}\nRMSE: {rmse_train:.3f}', transform=plt.gca().transAxes, fontsize=12, verticalalignment='top')
 plt.legend()

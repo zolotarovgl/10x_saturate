@@ -14,5 +14,12 @@ python scripts/plot_curve.py  output.tsv saturation.png
 `output.tsv` - contains the sequencing saturation statistics for to 10 (`-s`) subsampling steps   
 `saturation.png` - contains the plot of the saturation curve
 
-![Saturation curve](saturation.png)
+![Saturation curve](img/saturation.png)
+
+# Speed-up   
+
+The saturation can in principle be estimated from the reads coming from a subset of chromosomes.  
+
+__TODO: add speed vs estimated saturation plot__  
+ 
 

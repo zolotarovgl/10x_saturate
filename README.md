@@ -21,6 +21,11 @@ python scripts/plot_curve.py  output.tsv saturation.png --target 0.7
 
 ![Saturation curve](img/saturation.png)
 
+It's useful to examine residuals plot to see if the model tends to over or underestimate the coverage needeed.   
+
+
+![Residuals](img/saturation_residuals.png)
+
 # Speed-up   
 
 The saturation can in principle be estimated from the reads coming from a subset of chromosomes.  

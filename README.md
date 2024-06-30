@@ -12,8 +12,8 @@ python saturation_table.py -b test/sample.bam -n 1000 -r 0.8 -o output.tsv
 ```
 _CAVE_: this creates a big tabular file 
 
-```bash
 Fit the MM model, predict the number of input reads for `--target` saturation and plot:
+```bash
 python scripts/plot_curve.py  output.tsv saturation.png --target 0.7 
 ```
 `output.tsv` - contains the sequencing saturation statistics for to 10 (`-s`) subsampling steps   

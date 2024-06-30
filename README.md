@@ -1,5 +1,5 @@
 
-## Compute sample saturation curve by subsampling the dataset. 
+## Compute sample saturation curve by downsampling 
 
 This script subsamples the .bam file and fits the saturation curve based on the amount of __input reads__. For the estimation  to be precise, the mapping rate and the number of cells should be supplied.  
 

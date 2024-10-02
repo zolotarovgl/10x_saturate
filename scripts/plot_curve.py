@@ -44,6 +44,7 @@ def compute_confidence_intervals(x, popt, pcov, alpha=0.95):
 parser = argparse.ArgumentParser(description='Fit a saturation model and plot the saturation curve.')
 parser.add_argument('infile', help='Input file containing data (CSV format)')
 parser.add_argument('plotfile', help='Output plot file (PNG format)')
+parser.add_argument('--textfile', default=None, help='Optional output text file (TSV format)')
 parser.add_argument('--maxx', type=float, default=5, help='Factor by which to increase coverage')
 parser.add_argument('--n_points', type=int, default=200, help='Number of points to predict saturation')
 parser.add_argument('--target', type=float, default=0.7, help='Target saturation')
@@ -95,6 +96,18 @@ def find_ninput_for_saturation(Vmax, Km, target_saturation=0.7):
 ninput_saturation = find_ninput_for_saturation(popt[0], popt[1], target_saturation)
 
 print(f"To achieve a saturation of {target_saturation:.2f}, ninput should be approximately: {ninput_saturation / 1e6 :.1f} M reads")
+
+# Save output text file
+if args.textfile:
+    do = pd.DataFrame({
+        'reads': np.concatenate([d['ninput'], da['ninput']]),
+        'type': np.concatenate([['train'] * len(d), ['predict'] * len(da)]),
+        'saturation': pd.concat([pred_train, pred_new], ignore_index=True),
+        'confidence_intervals': np.concatenate([np.zeros(len(pred_train)), confidence_intervals]),
+        'saturation_reads': ninput_saturation * np.ones(len(np.concatenate([d['ninput'], da['ninput']]))),
+    })
+    do.to_csv(args.textfile, sep='\t', index=False)
+    print(f"Output saved to {args.textfile}")
 
 # Plotting with metrics
 plt.figure(figsize=(10, 6))

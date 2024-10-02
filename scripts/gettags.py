@@ -9,15 +9,27 @@ def process_chromosome(bam_file, chrom, output_file):
     with open(output_file, mode='w', newline='') as file:
         writer = csv.writer(file, delimiter='\t')
         for read in bam.fetch(chrom):
-            if read.has_tag("CB") and read.has_tag("xf") and read.has_tag("UB") and read.has_tag("GX"):
+            # cell barcode
+            if read.has_tag("CB"):
                 cb = read.get_tag("CB")
-                xf = read.get_tag("xf")
-                ub = read.get_tag("UB")
-                gx = read.get_tag("GX")
             else:
                 cb = None
-                xf = None
+            # UMI
+            if read.has_tag("UB"):
+                ub = read.get_tag("UB")
+            elif read.has_tag("pN"):
+                ub = read.get_tag("pN")
+            else:
                 ub = None
+            # tag
+            if read.has_tag("xf"):
+                xf = read.get_tag("xf")
+            else:
+                xf = None
+            # gene
+            if read.has_tag("gx"):
+                gx = read.get_tag("gx")
+            else:
                 gx = None
             writer.writerow([cb, xf, ub, gx])
         #print(f"done {chrom}.")

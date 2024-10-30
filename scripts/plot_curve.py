@@ -45,7 +45,7 @@ parser = argparse.ArgumentParser(description='Fit a saturation model and plot th
 parser.add_argument('infile', help='Input file containing data (CSV format)')
 parser.add_argument('plotfile', help='Output plot file (PNG format)')
 parser.add_argument('--textfile', default=None, help='Optional output text file (TSV format)')
-parser.add_argument('--maxx', type=float, default=10, help='Factor by which to increase coverage')
+parser.add_argument('--maxx', type=float, default=30, help='Factor by which to increase coverage')
 parser.add_argument('--n_points', type=int, default=100, help='Number of points to predict saturation for')
 parser.add_argument('--target', type=float, default=0.7, help='Target saturation')
 args = parser.parse_args()
@@ -126,7 +126,7 @@ if ninput_saturation <= max(da['ninput']):
     plt.axvline(x=ninput_saturation / 1e6, color='blue', linestyle=':', label=f'Needed input: {ninput_saturation / 1e6:.1f}')
 plt.axhline(y=target_saturation, color='lightblue', linestyle=':', label=f'Target: {target_saturation:.2f}')
 plt.axhline(y=highest_saturation, color='grey', linestyle=':', label=f'Highest Saturation: {highest_saturation:.2f}')
-plt.title(args.infile)
+plt.title(f'{args.infile}: {ninput_saturation / 1e6:.1f}M reads')
 plt.text(0.05, 0.9, f'R-squared: {r2_train:.3f}\nRMSE: {rmse_train:.3f}', transform=plt.gca().transAxes, fontsize=12, verticalalignment='top')
 plt.legend()
 

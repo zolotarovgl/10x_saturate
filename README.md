@@ -7,7 +7,7 @@ Downsample the reads, extract the tags and compute saturation stats (use `-c` to
 
 
 ```bash
-python saturation_table.py -b test/sample.bam -n 1000 -r 0.8 -o output.tsv
+python saturation_table.py --ncpu 5 -b test/sample.bam -n 1000 -r 0.8 -o output.tsv
 ```
 __CAVE: this creates a big tabular file__ 
 
@@ -21,6 +21,5 @@ python scripts/plot_curve.py  output.tsv saturation.png --target 0.7
 ![Saturation curve](img/saturation.png)
 
 It's useful to examine residuals plot to see if the model tends to over or underestimate the coverage needeed.   
-
 
 ![Residuals](img/saturation_residuals.png)

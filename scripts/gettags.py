@@ -3,6 +3,36 @@ import pysam
 import csv
 import os
 from concurrent.futures import ProcessPoolExecutor
+import subprocess
+
+def checkbam(input_bam,n_check = 10000000):
+    with pysam.AlignmentFile(input_bam, "rb") as in_bam:
+        print(f'Checking whether {input_bam} contains any secondary alignments or unmapped reads.' )
+        for i,read in enumerate(in_bam):
+            if i < n_check:
+                # Keep only primary alignments (those without the secondary alignment flag 0x100)
+                if read.is_secondary or read.is_unmapped:
+                    return(True)
+            else:
+                return(False)
+        else:
+            return(False)
+        
+def keep_primary(input_bam,output_bam,num_threads = 1):
+    #with pysam.AlignmentFile(input_bam, "rb") as in_bam, pysam.AlignmentFile(output_bam, "wb", header=in_bam.header) as out_bam:
+    #    for read in in_bam:
+    #        # Keep only primary alignments (those without the secondary alignment flag 0x100)
+    #        if not read.is_secondary:
+    #            out_bam.write(read)
+    # Define the command as a list
+    cmd = ["samtools", "view","-@", str(num_threads) , "-h", "-F", "0x100", input_bam, "-o", output_bam]
+    # Run the command
+    print(f'Running: {" ".join(cmd)}')
+    subprocess.run(cmd, check=True)
+    cmd = ["samtools", "index", output_bam]
+    # Run the command
+    print(f'Running: {" ".join(cmd)}')
+    subprocess.run(cmd, check=True)
 
 def process_chromosome(bam_file, chrom, output_file):
     bam = pysam.AlignmentFile(bam_file, "rb")
@@ -40,6 +70,19 @@ def main(bam_file, output_prefix, num_threads):
     if not os.path.exists(output_prefix):
         os.makedirs(output_prefix)
 
+    # Check if the .bam contains only primary alignments - this is important 
+        
+    clean_bam = '%s/clean.bam' % output_prefix
+    status = checkbam(bam_file)
+    if(status):
+        print(f'{bam_file} contains secondary alignments or unmapped reads. Filtering ... => {clean_bam}')
+        keep_primary(bam_file,clean_bam,num_threads)
+        print(f'Created: {clean_bam}')
+        bam_file = clean_bam
+    else:
+        print(f'{bam_file} contains only primary alignments.')
+
+    
     bam = pysam.AlignmentFile(bam_file, "rb")
     chromosomes = bam.references
     bam.close()

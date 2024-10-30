@@ -40,7 +40,7 @@ print(f"Compute sequencing saturation curve")
 print(f"Alignment: {BAM}\nOutput: {OUTPUT}\nN cells: {NCELLS}\nMapping rate: {MAPPING_RATE}\nN threads: {NCPU}")
 
 
-gettags_command = ['python', 'scripts/gettags.py', '--num_threads', str(NCPU), BAM, TEMP]
+gettags_command = ['python', 'scripts/gettags.py',  BAM, TEMP, '--num_threads', str(NCPU)]
 print(f"Executing command: {' '.join(gettags_command)}")
 subprocess.run(gettags_command)
 

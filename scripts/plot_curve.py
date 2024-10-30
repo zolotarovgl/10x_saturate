@@ -45,8 +45,8 @@ parser = argparse.ArgumentParser(description='Fit a saturation model and plot th
 parser.add_argument('infile', help='Input file containing data (CSV format)')
 parser.add_argument('plotfile', help='Output plot file (PNG format)')
 parser.add_argument('--textfile', default=None, help='Optional output text file (TSV format)')
-parser.add_argument('--maxx', type=float, default=5, help='Factor by which to increase coverage')
-parser.add_argument('--n_points', type=int, default=200, help='Number of points to predict saturation')
+parser.add_argument('--maxx', type=float, default=10, help='Factor by which to increase coverage')
+parser.add_argument('--n_points', type=int, default=100, help='Number of points to predict saturation for')
 parser.add_argument('--target', type=float, default=0.7, help='Target saturation')
 args = parser.parse_args()
 
@@ -63,7 +63,6 @@ except FileNotFoundError:
 da = pd.DataFrame({'ninput': np.linspace(min(d['ninput']), max(d['ninput']) * args.maxx, num=args.n_points)})
 pred_train, pred_new, popt, pcov = fit_model(d, da)
 highest_saturation = np.max(pred_new)
-
 # Calculate residuals
 residuals = d['sat'] - pred_train
 
@@ -74,7 +73,7 @@ confidence_intervals = compute_confidence_intervals(da['ninput'], popt, pcov)
 r2_train = r2_score(d['sat'], pred_train)
 rmse_train = np.sqrt(mean_squared_error(d['sat'], pred_train))
 
-# Report the input ninput where saturation is 0.7
+# Report ninput where saturation reaches 0.7
 def find_ninput_for_saturation(Vmax, Km, target_saturation=0.7):
     # Function to solve for ninput when saturation is target_saturation
     def saturation_eq(ninput):
@@ -87,14 +86,19 @@ def find_ninput_for_saturation(Vmax, Km, target_saturation=0.7):
     from scipy.optimize import fsolve
     ninput_solution = fsolve(saturation_eq, initial_guess)[0]
 
-    print(f"Vmax: {Vmax:.3f}; Km: {Km:.3f}")
-    print(f"Initial guess: {initial_guess}")
-    print(f"ninput_solution: {ninput_solution}")
+    #print(f"Vmax: {Vmax:.3f}; Km: {Km:.3f}")
+    #print(f"Initial guess: {initial_guess}")
+    #print(f"ninput_solution: {ninput_solution}")
 
     return ninput_solution
 
 ninput_saturation = find_ninput_for_saturation(popt[0], popt[1], target_saturation)
 
+
+ninput = d.iloc[-1]['ninput']
+input_saturation = d.iloc[-1]['sat']
+print(f"Input number of reads: {ninput / 1e6 :.1f} M reads")
+print(f"Maximum observed saturation: {input_saturation:.2f} M reads")
 print(f"To achieve a saturation of {target_saturation:.2f}, ninput should be approximately: {ninput_saturation / 1e6 :.1f} M reads")
 
 # Save output text file
@@ -107,9 +111,10 @@ if args.textfile:
         'saturation_reads': ninput_saturation * np.ones(len(np.concatenate([d['ninput'], da['ninput']]))),
     })
     do.to_csv(args.textfile, sep='\t', index=False)
-    print(f"Output saved to {args.textfile}")
+    #print(f"Output saved to {args.textfile}")
 
 # Plotting with metrics
+
 plt.figure(figsize=(10, 6))
 plt.plot(da['ninput'] / 1e6, pred_new, color='gray', label='Projected saturation', alpha=0.5)
 plt.fill_between(da['ninput'] / 1e6, pred_new - confidence_intervals, pred_new + confidence_intervals, color='gray', alpha=0.2, label='Confidence interval')
@@ -117,7 +122,8 @@ plt.scatter(d['ninput'] / 1e6, pred_train, color='red', label='Downsampled satur
 plt.xlabel('Coverage, M reads')
 plt.ylabel('Saturation')
 plt.axvline(x=d.iloc[-1]['ninput'] / 1e6, color='red', linestyle=':')
-plt.axvline(x=ninput_saturation / 1e6, color='blue', linestyle=':', label=f'Needed input: {ninput_saturation / 1e6:.1f}')
+if ninput_saturation <= max(da['ninput']):
+    plt.axvline(x=ninput_saturation / 1e6, color='blue', linestyle=':', label=f'Needed input: {ninput_saturation / 1e6:.1f}')
 plt.axhline(y=target_saturation, color='lightblue', linestyle=':', label=f'Target: {target_saturation:.2f}')
 plt.axhline(y=highest_saturation, color='grey', linestyle=':', label=f'Highest Saturation: {highest_saturation:.2f}')
 plt.title(args.infile)
@@ -128,7 +134,7 @@ plt.legend()
 plt.savefig(args.plotfile)
 plt.close()
 
-print(f"Plot saved to {args.plotfile}")
+#print(f"Plot saved to {args.plotfile}")
 
 # Plot residuals
 plt.figure(figsize=(10, 6))
@@ -140,5 +146,5 @@ plt.title('Residuals Plot')
 plt.savefig(args.plotfile.replace('.png', '_residuals.png'))
 plt.close()
 
-print(f"Residuals plot saved to {args.plotfile.replace('.png', '_residuals.png')}")
+#print(f"Residuals plot saved to {args.plotfile.replace('.png', '_residuals.png')}")
 

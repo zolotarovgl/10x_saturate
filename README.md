@@ -2,12 +2,9 @@
 ## Compute sample saturation curve by downsampling 
 
 This script subsamples the .bam file and fits the saturation curve based on the amount of __input reads__. For the estimation  to be precise, the mapping rate and the number of cells should be supplied.  
-
-__CAVE__: the model tends to __overestimate__ the coverage needed.   
-
 Example toy dataset: 1000 cells, 80% mapping rate
-
 Downsample the reads, extract the tags and compute saturation stats (use `-c` to use more cores): 
+
 
 ```bash
 python saturation_table.py -b test/sample.bam -n 1000 -r 0.8 -o output.tsv
@@ -27,10 +24,3 @@ It's useful to examine residuals plot to see if the model tends to over or under
 
 
 ![Residuals](img/saturation_residuals.png)
-
-# Speed-up   
-
-The saturation can in principle be estimated from the reads coming from a subset of chromosomes.  
-
-__TODO: add speed vs estimated saturation plot__  
-__TODO: add residuals! __ 

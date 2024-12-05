@@ -1,7 +1,15 @@
 options(warn=-1)
-library(data.table)
-library(parallel)
-library(argparse)
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+if (!requireNamespace("data.table", quietly = TRUE)) {
+  install.packages("data.table")
+}
+if (!requireNamespace("parallel", quietly = TRUE)) {
+  install.packages("parallel")
+}
+if (!requireNamespace("argparse", quietly = TRUE)) {
+  install.packages("argparse")
+}
+ 
 
 .get_sat <- function(u, n = NULL) {
   # u - combination matrix 

@@ -3,7 +3,7 @@
 
 __TODOs:__  
 - check if supplying the .bam file with unaligned reads makes a difference  
-
+- handle different .bam files - with mapped and unmapped reads - better reporting     
 
 This script subsamples the .bam file and fits the saturation curve based on the amount of __input reads__. 
 For the estimation  to be precise, the mapping rate and the number of cells should be supplied.  

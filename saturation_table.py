@@ -30,7 +30,8 @@ CODE_DIR = os.path.dirname(os.path.abspath(__file__))
 gettags_script = os.path.join(CODE_DIR,'scripts/gettags.py')
 compute_saturation_script = os.path.join(CODE_DIR,'scripts/compute_saturation.r')
 
-
+remove_temp = False
+remove_tab = False
 # Remove temporary directory if it exists
 if os.path.exists(TEMP):
     print(f'Found temp directory {TEMP}! Remove it or set a new TEMP directory!')
@@ -56,13 +57,14 @@ with open(TABFILE, 'wb') as outfile:
 
 print(f"Counting tags done: {TABFILE}")
 # Remove temporary directory
-subprocess.run(['rm', '-rf', TEMP])
-
-print(f"Removed temp directory: {TEMP}")
+if remove_temp:
+    subprocess.run(['rm', '-rf', TEMP])
+    print(f"Removed temp directory: {TEMP}")
 # Execute compute_saturation.r script
 subprocess.run(['Rscript', compute_saturation_script, '--ncpu', str(NCPU), '--mapping_rate', str(MAPPING_RATE), TABFILE, OUTPUT, str(NCELLS), '--nstep', str(NSTEPS)])
 
-# Uncomment the line below if you want to remove TABFILE after execution
-# subprocess.run(['rm', TABFILE])
+
+if remove_tab:
+    subprocess.run(['rm', TABFILE])
 print(f"Saturation done: {OUTPUT}")
 

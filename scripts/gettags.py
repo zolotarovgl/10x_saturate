@@ -19,13 +19,8 @@ def checkbam(input_bam,n_check = 10000000):
             return(False)
         
 def keep_primary(input_bam,output_bam,num_threads = 1):
-    #with pysam.AlignmentFile(input_bam, "rb") as in_bam, pysam.AlignmentFile(output_bam, "wb", header=in_bam.header) as out_bam:
-    #    for read in in_bam:
-    #        # Keep only primary alignments (those without the secondary alignment flag 0x100)
-    #        if not read.is_secondary:
-    #            out_bam.write(read)
-    # Define the command as a list
-    cmd = ["samtools", "view","-@", str(num_threads) , "-h", "-F", "0x100", input_bam, "-o", output_bam]
+    # keep only the primary alignments:
+    cmd = ["samtools", "view","-@", str(num_threads) , "-h", "-F", "260", input_bam, "-o", output_bam]
     # Run the command
     print(f'Running: {" ".join(cmd)}')
     subprocess.run(cmd, check=True)
